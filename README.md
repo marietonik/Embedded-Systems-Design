@@ -1,1 +1,1 @@
-# Embedded-Circuits
+# Embedded Circuit Design
