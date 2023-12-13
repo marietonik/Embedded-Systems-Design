@@ -42,7 +42,7 @@ double Calculate_Hu_central_moment(unsigned int *binaryVector, unsigned long hei
   unsigned int central_moment_pq=0, central_moment_00=0;
   unsigned long i,j;
   double central_moment_pq_norm;
-
+  
   #pragma omp parallel for private(i,j) num_threads(nt) collapse(2)
   for (i = 0; i < height; i++) {
     for (j = 0; j < width; j++) {
@@ -51,6 +51,7 @@ double Calculate_Hu_central_moment(unsigned int *binaryVector, unsigned long hei
     }
   }
   
+  #pragma omp barrier
   central_moment_pq_norm = (double)(central_moment_pq) / pow((double)(central_moment_00), 1+(p+q) / 2.0);
   return central_moment_pq_norm;
 }
@@ -91,15 +92,18 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
         total += binaryVector[i*width+j];
     }
   }
-  
+  #pragma omp barrier
   centroid_x = sum_x / total;
+  #pragma omp barrier
   centroid_y = sum_y / total;
+  #pragma omp barrier
 
   printf("\nCentroid X: %f\n", centroid_x);
   printf("Centroid Y: %f\n", centroid_y);
   printf("Total: %u\n", total);
 
   // Υπολογισμός κεντρικών ροπών και κανονονικοποίηση τιμών
+  #pragma omp barrier
   eta00 = Calculate_Hu_central_moment(binaryVector,height,width,centroid_x,centroid_y,0,0,nt);
   eta20 = Calculate_Hu_central_moment(binaryVector,height,width,centroid_x,centroid_y,2,0,nt)/(eta00 * eta00);
   eta02 = Calculate_Hu_central_moment(binaryVector,height,width,centroid_x,centroid_y,0,2,nt)/(eta00 * eta00);
@@ -108,7 +112,7 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   eta12 = Calculate_Hu_central_moment(binaryVector,height,width,centroid_x,centroid_y,1,2,nt)/(eta00 * eta00);
   eta21 = Calculate_Hu_central_moment(binaryVector,height,width,centroid_x,centroid_y,2,1,nt)/(eta00 * eta00);
   eta03 = Calculate_Hu_central_moment(binaryVector,height,width,centroid_x,centroid_y,0,3,nt)/(eta00 * eta00);
-
+  #pragma omp barrier
 
   // Υπολογισμός Hu ροπών - Moments και κανονικοποίηση
   Hu1 = eta20 + eta02;
@@ -119,6 +123,7 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   Hu6 = (eta20 - eta02) * ((eta30 + eta12) * (eta30 + eta12) - (eta21 + eta03) * (eta21 + eta03)) + 4 * eta11 * (eta30 + eta12) * (eta21 + eta03);
   Hu7 = (3 * eta21 - eta03) * (eta21 + eta03) * (3 * (eta30 + eta12) * (eta30 + eta12) - (eta21 + eta03) * (eta21 + eta03))- (eta30 - 3 * eta12) * (eta21 + eta03) * (3 * (eta30 + eta12) * (eta30 + eta12) - (eta21 + eta03) * (eta21 + eta03));
 
+  #pragma omp barrier
   norm_hu1 = -logf(fabsf(Hu1));
   norm_hu2 = -logf(fabsf(Hu2));
   norm_hu3 = -logf(fabsf(Hu3));
@@ -126,7 +131,8 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   norm_hu5 = -logf(fabsf(Hu5));
   norm_hu6 = -logf(fabsf(Hu6));
   norm_hu7 = -logf(fabsf(Hu7));
-
+  #pragma omp barrier
+  
   // Εκτύπωση Hu moments
   printf("Hu Moments:\n");
   printf("Hu1: %.20f\n", norm_hu1);
@@ -136,8 +142,7 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   printf("Hu5: %.20f\n", norm_hu5);
   printf("Hu6: %.20f\n", norm_hu6);
   printf("Hu7: %.20f\n", norm_hu7);
-
-  #pragma omp parallel for private(i,j) num_threads(nt) collapse(2)
+  
   for (i = 0; i < height; i++) {
     for (j = 0; j < width; j++) {
         // Integers σε ASCII
@@ -200,14 +205,15 @@ for (i = 0; i < height; i++) {
 
 // t1 -> κλήση συνάρτησης χρόνου
 for(nt=1; nt<=64; nt*=2){
+#pragma omp barrier
 t1=omp_get_wtime();
-
 // Εδώ θα καλέσετε τη συνάρτηση που υλοποιεί τη ζητούμενη λειτουργία
 // Allocate memory for the flattened version (for processing)
 // Εκκίνηση της επεξεργασίας εικόνας
 outimg = processImage(inimg, outimg, height, width,nt);
 
 // t2 -> κλήση συνάρτησης χρόνου
+#pragma omp barrier
 t2=omp_get_wtime();
 if(nt==1){
     speedup=t2-t1;
