@@ -137,6 +137,7 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   printf("Hu6: %.20f\n", norm_hu6);
   printf("Hu7: %.20f\n", norm_hu7);
 
+  #pragma omp parallel for private(i,j) num_threads(nt) collapse(2)
   for (i = 0; i < height; i++) {
     for (j = 0; j < width; j++) {
         // Integers σε ASCII
@@ -212,7 +213,7 @@ if(nt==1){
     speedup=t2-t1;
 }
 printf("\nExecution time: %f seconds\n", t2-t1);
-printf("Speedup: %f\n",(double)(speedup/(t2-t1)));
+printf("Speedup: %f, Numbers of cores: %d\n",(double)(speedup/(t2-t1)),nt);
 }
 
 // Αν η έξοδος σας είναι εικόνα αποθηκεύστε την με τον παρακάτω κώδικα
