@@ -192,16 +192,8 @@ for (i = 0; i < height; i++) {
   }
 }
 
-// t1 -> κλήση συνάρτησης χρόνου
-
-// Εδώ θα καλέσετε τη συνάρτηση που υλοποιεί τη ζητούμενη λειτουργία
-// Allocate memory for the flattened version (for processing)
-// Εκκίνηση της επεξεργασίας εικόνας
 outimg = processImage(inimg, outimg, height, width);
 
-// t2 -> κλήση συνάρτησης χρόνου
-
-// Αν η έξοδος σας είναι εικόνα αποθηκεύστε την με τον παρακάτω κώδικα
 strcpy(outfname, "output_image.raw");
 write_rawimage(outfname, height, width, outimg);
 
