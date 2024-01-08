@@ -95,9 +95,9 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   }
 
   // Δέσμευση μνήμης διανυσμάτων σε όλες τις διεργασίες
-  processImg = (unsigned int *)malloc(height * width / size * sizeof(unsigned int));
-  grayscaleVector = (unsigned int *)malloc(height * width / size * sizeof(unsigned int));
-  binaryVector = (unsigned int *)malloc(height * width / size * sizeof(unsigned int));
+  processImg = (unsigned int *)malloc(height * width * sizeof(unsigned int));
+  grayscaleVector = (unsigned int *)malloc(height * width * sizeof(unsigned int));
+  binaryVector = (unsigned int *)malloc(height * width * sizeof(unsigned int));
 
   // Δέσμευση μνήμης rec_buffer σε όλες τις διεργασίες
   rec_buffer = (unsigned char *)malloc(width * height / size * sizeof(unsigned char));
