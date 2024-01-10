@@ -61,8 +61,7 @@ double Calculate_Hu_central_moment(unsigned int *sent_buffer, unsigned long heig
 
 unsigned char** processImage(unsigned char **input_img, unsigned char **output_img, unsigned long height, unsigned long width) {
   
-  int rank, size, *sendcounts, *displs, scatterResult;
-  MPI_Barrier(MPI_COMM_WORLD);
+  int rank, size, *sendcounts, *displs;
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   printf("Debug Point 1 - Process %d of %d\n", rank, size);
@@ -76,7 +75,7 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   double Hu1, Hu2, Hu3, Hu4, Hu5, Hu6, Hu7;
   double norm_hu1, norm_hu2, norm_hu3, norm_hu4, norm_hu5, norm_hu6, norm_hu7;
   double start_time_parallel, end_time_parallel, start_allocation_time, end_allocation_time, time_parallel;
-
+  
   start_allocation_time = MPI_Wtime();
 
   if (rank == 0) {
@@ -132,12 +131,10 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
       }
   }
 
-  //MPI_Barrier(MPI_COMM_WORLD);
   MPI_Scatterv(input_img_vector, sendcounts, displs, MPI_UNSIGNED_CHAR, rec_buffer, sendcounts[rank], MPI_UNSIGNED_CHAR, 0, MPI_COMM_WORLD);
-  MPI_Barrier(MPI_COMM_WORLD);
 
   // After MPI_Scatterv
-  printf("Debug Point 3 - Process %d: After Scatter\n", rank);
+  printf("Debug Point 2 - Process %d: After Scatter\n", rank);
   
   for (i = 0; i < height / size; i++) {
     for (j = 0; j < width; j++) {
@@ -153,6 +150,8 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
         total += sent_buffer[i*width+j];
     }
   }
+  
+  printf("Debug Point 3 - Process %d: After Data Processing\n", rank);
 
   centroid_x = sum_x / total;
   centroid_y = sum_y / total;
@@ -185,14 +184,16 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   norm_hu6 = -logf(fabsf(Hu6));
   norm_hu7 = -logf(fabsf(Hu7));
 
+  printf("Debug Point 4 - Process %d: Before MPI_Gatherv\n", rank);
+
   // Gather the results back to the root process
   MPI_Gatherv(sent_buffer, sendcounts[rank], MPI_UNSIGNED, binaryVector, sendcounts, displs, MPI_UNSIGNED, 0, MPI_COMM_WORLD);
 
-  //MPI_Barrier(MPI_COMM_WORLD);
+  MPI_Barrier(MPI_COMM_WORLD);
   end_time_parallel = MPI_Wtime();
 
   if (rank == 0) {
-
+  
   printf("\nCentroid X: %f\n", centroid_x);
   printf("Centroid Y: %f\n", centroid_y);
   printf("Total: %u\n", total);
@@ -206,13 +207,10 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   printf("Hu5: %.20f\n", norm_hu5);
   printf("Hu6: %.20f\n", norm_hu6);
   printf("Hu7: %.20f\n", norm_hu7);
-
+  
   time_parallel = end_time_parallel - start_time_parallel;
   printf("\n\nElapsed time for allocation only: %f seconds\n", end_allocation_time - start_allocation_time);
   printf("Elapsed parallel time: %f seconds\n\n", time_parallel);
-
-  free(rec_buffer);
-  free(sent_buffer);
 
   for (i = 0; i < height; i++) {
     for (j = 0; j < width; j++) {
@@ -220,15 +218,17 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
         output_img[i][j] = (char)(binaryVector[i*width+j]+'0');
     }
   }
-  }
 
   free(input_img_vector);
+  free(rec_buffer);
+  free(sent_buffer);
+  }
+
   free(processImg);
   free(grayscaleVector);
   free(binaryVector);
   free(sendcounts);
   free(displs);
-
   return output_img;
 }
 
