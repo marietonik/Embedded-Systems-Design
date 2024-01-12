@@ -191,9 +191,8 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
 
   MPI_Barrier(MPI_COMM_WORLD);
   end_time_parallel = MPI_Wtime();
-
-  if (rank == 0) {
   
+  // Εκτύπωση αποτελεσμάτων σε κάθε πυρήνα
   printf("\nCentroid X: %f\n", centroid_x);
   printf("Centroid Y: %f\n", centroid_y);
   printf("Total: %u\n", total);
@@ -207,11 +206,12 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   printf("Hu5: %.20f\n", norm_hu5);
   printf("Hu6: %.20f\n", norm_hu6);
   printf("Hu7: %.20f\n", norm_hu7);
-  
+
   time_parallel = end_time_parallel - start_time_parallel;
   printf("\n\nElapsed time for allocation only: %f seconds\n", end_allocation_time - start_allocation_time);
   printf("Elapsed parallel time: %f seconds\n\n", time_parallel);
 
+  if (rank == 0) {
   for (i = 0; i < height; i++) {
     for (j = 0; j < width; j++) {
         // Integers σε ASCII
