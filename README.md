@@ -1,4 +1,4 @@
-# Embedded Circuit Design
+# Embedded Systems Design
 
 ## Hu Moments from Images using OpenMP & MPI
 A part of this repository contains the use of OpenMP for parallelizations in a Code specified for Hu Moments calculations. OpenMP is an implementation of multithreading, a method of parallelizing whereby a thread forks a specified number of threads and the system divides a task among them. Bitwise program used for the client's server connection among network.
