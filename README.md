@@ -4,7 +4,9 @@ A part of this repository contains the use of OpenMP for parallelizations in a C
 
 * The original code does not provide the metrics of the library OpenMP and it is only used for Image processing purposes.
 
-* The code that implements OpenMP parallelizations provides the time of parallelization technique and the Speedup Time. 
+* The code that implements OpenMP parallelizations provides the time of parallelization technique and the Speedup Time.
+
+* The code that implements MPI parallelizations provides the time of parallelization in every rank.
 
 A part of this repository contains the process of extracting histograms of images and equalizing their variants with statistical methods, while the creator applies various optimization techniques in the original code and measures the efficiency using [AMD Software](https://www.amd.com/en/technologies/software).
 
