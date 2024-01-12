@@ -11,7 +11,8 @@ A part of this repository contains the use of OpenMP for parallelizations in a C
 
   Relative Directories:
 
-1) Images.
+1) Codes.
+2) Images.
 
 Images used as input and relative outputs from the codes.
 
