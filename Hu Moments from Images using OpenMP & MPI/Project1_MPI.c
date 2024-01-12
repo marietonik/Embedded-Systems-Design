@@ -207,6 +207,10 @@ unsigned char** processImage(unsigned char **input_img, unsigned char **output_i
   printf("Hu6: %.20f\n", norm_hu6);
   printf("Hu7: %.20f\n", norm_hu7);
 
+<<<<<<< Updated upstream:Hu Moments from Images using OpenMP & MPI/Project1_MPI.c
+=======
+  MPI_Barrier(MPI_COMM_WORLD);
+>>>>>>> Stashed changes:Hu Moments from Images using OpenMP/Project1_MPI.c
   time_parallel = end_time_parallel - start_time_parallel;
   printf("\n\nElapsed time for allocation only: %f seconds\n", end_allocation_time - start_allocation_time);
   printf("Elapsed parallel time: %f seconds\n\n", time_parallel);
